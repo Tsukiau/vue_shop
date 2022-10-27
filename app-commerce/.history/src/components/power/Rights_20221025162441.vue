@@ -1,0 +1,63 @@
+<template>
+  <div>
+    <!-- 面包屑 -->
+    <Breadcrumb name1="权限管理" name2="权限列表"/>
+    <!-- 卡片视图 -->
+    <el-card>
+      <el-table :data="RightsList" border stripe>
+        <el-table-column type="index"></el-table-column>
+        <el-table-column label="权限名称" prop="authName"></el-table-column>
+        <el-table-column label="路径" prop="path"></el-table-column>
+        <el-table-column label="权限等级" prop="level">
+          <template slot-scope="scope">
+            <el-tag type="success" v-if="scope.row.level === '0'">一级</el-tag>
+            <el-tag type="warning" v-else-if="scope.row.level === '1'">二级</el-tag>
+            <el-tag type="" v-else>三级</el-tag>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+    <!-- 添加角色 -->
+    <el-dialog
+  title="提示"
+  :visible.sync="dialogVisible"
+  width="30%"
+  :before-close="handleClose">
+  <span>这是一段信息</span>
+  <span slot="footer" class="dialog-footer">
+    <el-button @click="dialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+  </span>
+</el-dialog>
+  </div>
+</template>
+
+<script>
+import Breadcrumb from '../../common/Breadcrumb.vue'
+import { rightsApi } from '@/api/power'
+export default {
+  name: 'appPower',
+  components: { Breadcrumb },
+  data() {
+    return {
+      RightsList: []
+    }
+  },
+  created() {
+    this.getRightsApi()
+  },
+  methods: {
+    async getRightsApi() {
+      try {
+        const { data } = await rightsApi()
+        this.RightsList = data.data
+      } catch (err) {
+        this.$message.error('获取失败')
+      }
+    }
+  }
+}
+</script>
+<style  scoped>
+
+</style>

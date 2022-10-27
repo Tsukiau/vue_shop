@@ -1,0 +1,132 @@
+<template>
+  <el-container class="home_container">
+    <!-- 头部 -->
+    <el-header>
+      <div>
+        <img src="../../assets/t.jpg" alt="">
+        <span>后台管理系统</span>
+      </div>
+      <el-button type="info" round @click="loginOut">退出</el-button>
+    </el-header>
+    <!-- 主体 -->
+    <el-container>
+
+      <!-- 侧边 -->
+      <el-aside width="200px">
+        <div class="toggle_btn">|||</div>
+        <el-menu background-color="#313743" text-color="#fff" active-text-color="#329cff" unique-opened>
+          <!-- 一级菜单 -->
+          <el-submenu :index="index + ''" v-for="(item, index) in menusList" :key="item.id">
+            <template slot="title">
+              <i :class="iconsObj[item.id]"></i>
+              <span>{{item.authName}}</span>
+            </template>
+            <!-- 二级菜单 -->
+            <el-menu-item :index="index + '' " v-for="(item, index) in item.children" :key="item.id">
+              <template slot="title">
+                <i class="el-icon-menu"></i>
+                <span>{{item.authName}}</span>
+              </template>
+            </el-menu-item>
+w
+          </el-submenu>
+        </el-menu>
+      </el-aside>
+
+      <!-- 右边主体 -->
+      <el-main>Main</el-main>
+    </el-container>
+  </el-container>
+</template>
+
+<script>
+import { menusApi } from '@/api/home'
+export default {
+  name: 'appHome',
+  data() {
+    return {
+      menusList: [],
+      iconsObj: {
+        125: 'el-icon-user-solid',
+        103: 'el-icon-platform-eleme',
+        101: 'el-icon-s-goods',
+        102: 'el-icon-s-order',
+        145: 'el-icon-share'
+      }
+    }
+  },
+  created() {
+    this.loadMenusApi()
+  },
+  methods: {
+    // 退出
+    loginOut() {
+      this.$store.commit('setUser', '')
+      this.$router.push('/login')
+    },
+    // 所有菜单
+    async loadMenusApi() {
+      try {
+        const { data } = await menusApi()
+        console.log(data.data)
+        this.menusList = data.data
+      } catch (err) {
+        console.log('获取失败', err)
+        this.$message.error('获取菜单失败')
+      }
+    }
+  }
+
+}
+
+</script>
+
+<style  scoped lang="less">
+.home_container {
+  height: 100vh;
+}
+
+.el-header {
+  background-color: #363d40;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  font-size: 20px;
+  padding: 0 10px;
+
+  >div {
+    display: flex;
+    align-items: center;
+  }
+
+  img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+  }
+
+  span {
+    margin-left: 15px;
+  }
+}
+
+.el-aside {
+  background-color: #313743;
+}
+
+.el-main {
+  background-color: #e9edf1;
+}
+.el-menu{
+   border-right: 0;
+}
+.toggle_btn{
+  font-size: 20px;
+  line-height: 20px;
+  background-color: #475163;
+  color: #fff;
+  text-align: center;
+  
+}
+</style>

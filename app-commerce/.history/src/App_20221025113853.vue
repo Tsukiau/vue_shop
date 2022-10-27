@@ -1,0 +1,29 @@
+<template>
+  <div>
+    <router-view></router-view>
+    <div>
+      <input ref="myInp" type="text" placeholder="这是一个输入框">
+      <button @click="btn">点击我进行搜索</button>
+    </div>
+  </div>
+</template>
+
+<script>
+import { log } from 'console';
+
+export default {
+  name: 'app',
+  data() {
+    return {}
+  },
+  methods: {
+    btn() {
+      console.log(this.$refs.myInp)
+    }
+  }
+}
+
+</script>
+<style  scoped>
+
+</style>

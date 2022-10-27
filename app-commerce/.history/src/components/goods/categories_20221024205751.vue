@@ -1,0 +1,125 @@
+<template>
+  <div>
+    <!-- 面包屑 -->
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>商品管理</el-breadcrumb-item>
+      <el-breadcrumb-item>商品分类</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 卡片视图 -->
+    <el-card class="box-card">
+      <el-row>
+        <el-col>
+          <el-button type="primary">添加分类</el-button>
+        </el-col>
+      </el-row>
+      <!-- 表格 -->
+      <tree-table :data="categoriesList" :columns="columns" :selection-type="false" :expand-type="false" border
+        show-index index-text="#">
+        <!-- 是否有效 -->
+        <template slot="isok" slot-scope="scope">
+          <i class="el-icon-success" style="color: lightgreen" v-if="scope.row.cat_deleted === false"></i>
+          <i class="el-icon-error " style="color: red" v-else></i>
+        </template>
+        <!-- 排序 -->
+        <template slot="order" slot-scope="scope">
+          <el-tag type="primary" size="mini" v-if="scope.row.cat_level === 0">一级</el-tag>
+          <el-tag type="success" size="mini" v-else-if="scope.row.cat_level === 1">二级</el-tag>
+          <el-tag type="warning" size="mini" v-else>三级</el-tag>
+        </template>
+        <!-- 操作 -->
+        <template slot="opt">
+          <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+        </template>
+      </tree-table>
+      <!-- 分页 -->
+      <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+       :current-page="queryInfo.pagenum"
+        :page-sizes="[3, 8, 15, 30]"
+         :page-size="100"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total">
+      </el-pagination>
+    </el-card>
+  </div>
+</template>
+
+<script>
+import { categoriesApi } from '@/api/goods'
+export default {
+  name: 'app',
+  data() {
+    return {
+      // 商品分类的数据列表
+      categoriesList: [],
+      // 请求参数
+      queryInfo: {
+        type: 3,
+        pagenum: 1,
+        pagesize: 5
+      },
+      // 总数据条数
+      total: 0,
+      // 为table指定列的定义
+      columns: [
+        {
+          label: '分类名称',
+          prop: 'cat_name'
+        },
+        {
+          label: '是否有效',
+          // 表示,将当前列定义为模板列
+          type: 'template',
+          // 表示当前这一列使用模板名称
+          template: 'isok'
+        },
+        {
+          label: '排序',
+          // 表示,将当前列定义为模板列
+          type: 'template',
+          // 表示当前这一列使用模板名称
+          template: 'order'
+        },
+        {
+          label: '操作',
+          // 表示,将当前列定义为模板列
+          type: 'template',
+          // 表示当前这一列使用模板名称
+          template: 'opt'
+        }
+      ]
+    }
+  },
+  created() {
+    this.loadCategoriesApi()
+  },
+  methods: {
+    async loadCategoriesApi() {
+      try {
+        const { data } = await categoriesApi(this.queryInfo)
+        console.log(data.data.result)
+        this.categoriesList = data.data.result
+        this.total = data.data.total
+      } catch (err) {
+        this.$message.error('获取商品分类数据列表失败')
+        console.log('获取商品分类数据列表失败')
+      }
+    },
+    // 监听pagesize改变
+    handleSizeChange(newSize) {
+      this.queryInfo.pagesize = newSize
+      this.loadCategoriesApi()
+    },
+    // 监听页码的改变
+    handleCurrentChange(newPage) {
+      this.queryInfo.pagenum = newPage
+      this.loadCategoriesApi()
+    }
+  }
+}
+</script>
+<style  scoped>
+</style>
